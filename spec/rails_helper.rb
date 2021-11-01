@@ -1,3 +1,7 @@
+require 'simplecov'
+SimpleCov.start
+SimpleCov.add_filter ['spec']
+
 # This file is copied to spec/ when you run 'rails generate rspec:install'
 require 'spec_helper'
 
@@ -60,7 +64,7 @@ RSpec.configure do |config|
       example.run
     end
   end
- 
+
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   config.fixture_path = "#{::Rails.root}/spec/fixtures"
 
