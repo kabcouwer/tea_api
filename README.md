@@ -99,7 +99,7 @@ gem install rails --version 5.2.6
 
 
 ## Database Schema
-<img width="879" alt="tea_api_db_design" src="https://user-images.githubusercontent.com/80797707/139716125-2d551e69-0447-4f71-b938-865b4fcd3ede.png">
+<img width="810" alt="tea_api_db_design" src="https://user-images.githubusercontent.com/80797707/139956075-8b263766-53f4-432f-82c6-7893601b397d.png">
 
 
 ## Contributing
