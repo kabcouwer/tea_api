@@ -25,4 +25,6 @@ def create_factory
 
   # SUBSCRIPTIONS
   let!(:subscription1) { create(:subscription, status: :active, frequency: :monthly, customer: customer1, tea: tea1) }
+  let!(:subscription2) { create(:subscription, status: :cancelled, frequency: :bimonthly, customer: customer1, tea: tea3) }
+  let!(:subscription3) { create(:subscription, status: :cancelled, frequency: :bimonthly, customer: customer2, tea: tea3) }
 end
