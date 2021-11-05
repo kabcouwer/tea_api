@@ -1,4 +1,10 @@
 class Api::V1::Customers::SubscriptionsController < ApplicationController
+  def index
+    customer = Customer.find(params[:customer_id])
+    subs = customer.subscriptions
+    render json: SubscriptionSerializer.new(subs)
+  end
+
   def create
     check_headers and return if true
 
@@ -34,6 +40,9 @@ class Api::V1::Customers::SubscriptionsController < ApplicationController
   end
 
   private
+  def subscription_params
+  end
+
   def check_headers
     if request.content_type != 'application/json'
       bad_request('Json content type required')
