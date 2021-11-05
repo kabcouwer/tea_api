@@ -82,7 +82,7 @@ describe 'Customers Cancelling Subscriptions API' do
 
         error = result[:errors]
 
-        expect(error).to eq('Status Required')
+        expect(error).to eq("Status can't be blank")
       end
 
       it 'returns error if invalid json payload' do
@@ -101,12 +101,24 @@ describe 'Customers Cancelling Subscriptions API' do
         expect { patch "/api/v1/customers/#{@customer1.id}/subscriptions/10005", headers: @headers, params: @params1 }.to change(Subscription, :count).by(0)
 
         expect(response.status).to eq(404)
-        
+
         result = JSON.parse(response.body, symbolize_names: true)
 
         error = result[:error]
 
         expect(error).to eq('Not Found')
+      end
+
+      it 'returns error if params are sent through uri' do
+        expect { patch "/api/v1/customers/#{@customer1.id}/subscriptions/#{@subscription1.id}?status=cancelled", headers: @headers }.to change(Subscription, :count).by(0)
+
+        expect(response.status).to eq(400)
+
+        result = JSON.parse(response.body, symbolize_names: true)
+
+        error = result[:errors]
+
+        expect(error).to eq('Json params input required')
       end
     end
   end

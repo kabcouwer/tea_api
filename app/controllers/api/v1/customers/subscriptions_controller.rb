@@ -9,19 +9,19 @@ class Api::V1::Customers::SubscriptionsController < ApplicationController
     check_headers and return if true
 
     body = JSON.parse(request.raw_post, symbolize_names: true)
-    sub = Subscription.create(
-      title: body[:title],
-      price: body[:price],
-      frequency: body[:frequency],
-      tea_id: body[:tea_id],
-      customer_id: params[:customer_id]
-    )
 
-    if sub.save
-      render json: SubscriptionSerializer.new(sub), status: :created
+    if params[:customer_id].to_i == body[:customer_id]
+      sub = Subscription.create(subscription_params)
+      if sub.save
+        render json: SubscriptionSerializer.new(sub), status: :created
+      else
+        bad_request(sub.errors.full_messages.join(', '))
+      end
     else
-      bad_request(sub.errors.full_messages.join(', '))
+      bad_request('Subscriptions cannot be made for other customers')
     end
+  rescue JSON::ParserError
+    bad_request('Json params input required')
   end
 
   def update
@@ -33,14 +33,17 @@ class Api::V1::Customers::SubscriptionsController < ApplicationController
     if sub.update(status: body[:status])
       render json: SubscriptionSerializer.new(sub)
     else
-      bad_request('Status Required') and return
+      bad_request(sub.errors.full_messages.join(', '))
     end
   rescue ActiveRecord::RecordNotFound
     not_found
+  rescue JSON::ParserError
+    bad_request('Json params input required')
   end
 
   private
   def subscription_params
+    params.require(:subscription).permit(:title, :price, :frequency, :customer_id, :tea_id)
   end
 
   def check_headers
