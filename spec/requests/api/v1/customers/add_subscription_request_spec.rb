@@ -5,6 +5,7 @@ describe 'Customers Adding Subscriptions API' do
 
   before :each do
     @customer1 = Customer.first
+    @customer2 = Customer.second
 
     @tea2 = Tea.second
 
@@ -18,6 +19,7 @@ describe 'Customers Adding Subscriptions API' do
       title: Faker::Mountain.name,
       price: (Faker::Number.decimal(l_digits: 2)).to_s,
       frequency: 'quarterly',
+      customer_id: @customer1.id,
       tea_id: @tea2.id
     }.to_json
 
@@ -25,6 +27,15 @@ describe 'Customers Adding Subscriptions API' do
     @params2 = {
       title: Faker::Mountain.name,
       price: (Faker::Number.decimal(l_digits: 2)).to_s,
+      customer_id: @customer1.id,
+      tea_id: @tea2.id
+    }.to_json
+
+    @params3 = {
+      title: Faker::Mountain.name,
+      price: (Faker::Number.decimal(l_digits: 2)).to_s,
+      frequency: 'quarterly',
+      customer_id: @customer2.id,
       tea_id: @tea2.id
     }.to_json
   end
@@ -94,6 +105,30 @@ describe 'Customers Adding Subscriptions API' do
         error = result[:errors]
 
         expect(error).to eq('Json content type required')
+      end
+
+      it 'returns error if params are sent through uri' do
+        expect { post "/api/v1/customers/#{@customer1.id}/subscriptions?title=Test&price=9.99&frequency=monthly&tea_id=#{@tea2.id}", headers: @headers }.to change(Subscription, :count).by(0)
+
+        expect(response.status).to eq(400)
+
+        result = JSON.parse(response.body, symbolize_names: true)
+
+        error = result[:errors]
+
+        expect(error).to eq('Json params input required')
+      end
+
+      it 'returns error if customer id is not correct' do
+        expect { post "/api/v1/customers/#{@customer1.id}/subscriptions", headers: @headers, params: @params3 }.to change(Subscription, :count).by(0)
+
+        expect(response.status).to eq(400)
+
+        result = JSON.parse(response.body, symbolize_names: true)
+
+        error = result[:errors]
+
+        expect(error).to eq('Subscriptions cannot be made for other customers')
       end
     end
   end
